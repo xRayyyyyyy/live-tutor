@@ -1,0 +1,319 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Live-Tutor Progress Schema v1.6.1",
+  "description": "自适应学习进度跟踪数据结构（v1.6.1 单文件双 Tab + HTML 全流程覆盖）",
+  "type": "object",
+  "required": ["subject", "exam_type", "persona", "source_type", "syllabus_source", "total_chapters", "chapters", "diagnostic"],
+  "properties": {
+    "subject": {
+      "type": "string",
+      "description": "科目名称（初始化时为空，Step 0 填入）"
+    },
+    "textbook": {
+      "type": "string",
+      "description": "教材信息。PDF/PPT 路径存文件名，AI 生成路径存 'AI 生成: {科目}'"
+    },
+    "source_type": {
+      "type": "string",
+      "enum": ["", "pdf", "ppt", "markdown", "ai_generated", "course_library"],
+      "description": "内容来源类型（v1.5 新增，v1.6 扩展）。初始化为空，pdf/ppt/markdown=用户上传教材，ai_generated=AI从训练知识生成，course_library=预置课程库"
+    },
+    "syllabus_source": {
+      "type": "string",
+      "enum": ["", "extracted", "generated", "generated_websearch", "isbn_lookup", "prebuilt"],
+      "description": "章节结构来源（v1.5 新增）。初始化为空，extracted=从教材提取，generated=AI生成，generated_websearch=AI+WebSearch，isbn_lookup=ISBN/教材信息公开目录提取，prebuilt=预置"
+    },
+    "ai_generation_meta": {
+      "type": ["object", "null"],
+      "description": "AI 生成课程的元数据（v1.5 新增，仅 source_type=ai_generated 时有值）",
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "description": "用户输入的原始科目描述"
+        },
+        "websearch_used": {
+          "type": "boolean",
+          "description": "是否使用了 WebSearch 增强"
+        },
+        "websearch_queries": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "WebSearch 查询词列表"
+        },
+        "generation_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "user_confirmed_outline": {
+          "type": "boolean",
+          "description": "用户是否确认了生成的章节目录"
+        },
+        "user_edits": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "用户对大纲的手动编辑记录"
+        },
+        "isbn_lookup_meta": {
+          "type": "object",
+          "description": "ISBN/教材信息查询元数据（v1.5.1 新增，仅 syllabus_source=isbn_lookup 时有值）",
+          "properties": {
+            "isbn": {
+              "type": "string",
+              "description": "用户提供的 ISBN 码"
+            },
+            "book_info": {
+              "type": "string",
+              "description": "用户提供的非 ISBN 教材信息（书名/作者/出版社/版次）"
+            },
+            "source_urls": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "提取目录信息的公开网页 URL 列表"
+            },
+            "toc_raw": {
+              "type": "string",
+              "description": "从公开源提取的原始目录文本"
+            },
+            "lookup_date": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        }
+      }
+    },
+    "exam_type": {
+      "type": "string",
+      "enum": ["", "期末", "期中", "随堂", "考研", "其他"],
+      "description": "考试类型（初始化为空）"
+    },
+    "persona": {
+      "type": "string",
+      "description": "当前活跃的 Persona（初始化为空）"
+    },
+    "character": {
+      "type": "string",
+      "enum": ["lazy-sheep", "nezha", "xiaoxiaoguai", "grey-wolf", "none"],
+      "description": "IP 角色语音（v1.4 新增）"
+    },
+    "render_mode": {
+      "type": "string",
+      "enum": ["markdown", "html"],
+      "default": "markdown",
+      "description": "渲染模式（v1.4 新增）"
+    },
+    "persona_history": {
+      "type": "array",
+      "description": "Persona 切换历史",
+      "items": {
+        "type": "object",
+        "required": ["chapters", "persona", "reason"],
+        "properties": {
+          "chapters": {
+            "type": "array",
+            "items": { "type": "integer" }
+          },
+          "persona": { "type": "string" },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "diagnostic": {
+      "type": "object",
+      "required": ["mode", "date"],
+      "properties": {
+        "mode": {
+          "type": ["string", "null"],
+          "enum": ["快速", "深度", null],
+          "description": "摸底模式（初始化为 null）"
+        },
+        "score": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "level": {
+          "type": ["string", "null"],
+          "enum": ["L1", "L2", "L3", "L4", null]
+        },
+        "level_mode": {
+          "type": ["string", "null"],
+          "enum": ["基础模式", "巩固模式", "提升模式", "全面模式", null]
+        },
+        "date": {
+          "type": ["string", "null"],
+          "format": "date"
+        }
+      }
+    },
+    "total_chapters": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "章节总数（初始化时为 0，生成/确认大纲后 >=1）"
+    },
+    "chapters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["num", "title", "status", "history"],
+        "properties": {
+          "num": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "in_progress", "completed"]
+          },
+          "precheck_level": {
+            "type": ["string", "null"],
+            "enum": ["L1", "L2", "L3", "L4", null],
+            "description": "章节预检判定的起始等级"
+          },
+          "current_level": {
+            "type": ["string", "null"],
+            "enum": ["L1", "L2", "L3", "L4", null],
+            "description": "本章当前等级（per_chapter_level）"
+          },
+          "history": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["attempt", "level_before", "mode", "date"],
+              "properties": {
+                "attempt": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "level_before": {
+                  "type": "string",
+                  "enum": ["L1", "L2", "L3", "L4"]
+                },
+                "level_after": {
+                  "type": ["string", "null"],
+                  "enum": ["L1", "L2", "L3", "L4", null]
+                },
+                "score": {
+                  "type": ["number", "null"],
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "mode": {
+                  "type": "string",
+                  "enum": ["基础模式", "巩固模式", "提升模式", "全面模式"]
+                },
+                "date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "micro_quizzes": {
+                  "type": "array",
+                  "description": "微测试记录",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "section": { "type": "string" },
+                      "correct": { "type": "integer" },
+                      "total": { "type": "integer" }
+                    }
+                  }
+                },
+                "error_count": {
+                  "type": "integer",
+                  "description": "本次小测错题数"
+                }
+              }
+            }
+          },
+          "error_review_schedule": {
+            "type": "array",
+            "description": "错题复习计划",
+            "items": {
+              "type": "object",
+              "properties": {
+                "error_ids": {
+                  "type": "array",
+                  "items": { "type": "integer" }
+                },
+                "review_rounds": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "round": { "type": "integer" },
+                      "scheduled_days_after": { "type": "integer" },
+                      "completed": { "type": "boolean" },
+                      "completed_date": { "type": ["string", "null"] }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "knowledge_tracking": {
+      "type": "object",
+      "description": "SM-2 间隔重复追踪（v1.3 新增）",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["chapter", "title", "learned_at", "last_reviewed", "repetitions", "interval_days", "ef", "next_review"],
+        "properties": {
+          "chapter": { "type": "integer" },
+          "title": { "type": "string" },
+          "stars": { "type": "integer", "enum": [1, 2, 3] },
+          "learned_at": { "type": "string", "format": "date-time" },
+          "last_reviewed": { "type": "string", "format": "date-time" },
+          "repetitions": { "type": "integer", "minimum": 0 },
+          "interval_days": { "type": "integer", "minimum": 1 },
+          "ef": { "type": "number", "minimum": 1.3 },
+          "next_review": { "type": "string", "format": "date-time" },
+          "is_error": { "type": "boolean", "default": false },
+          "review_history": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["date"],
+              "properties": {
+                "date": { "type": "string", "format": "date" },
+                "quality": { "type": "integer", "minimum": 0, "maximum": 5 },
+                "action": { "type": "string", "enum": ["learned", "reviewed"] },
+                "interval_after": { "type": "integer" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "final_exam": {
+      "type": ["object", "null"],
+      "properties": {
+        "score": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "level": {
+          "type": ["string", "null"],
+          "enum": ["L1", "L2", "L3", "L4", null]
+        },
+        "date": {
+          "type": ["string", "null"],
+          "format": "date"
+        },
+        "source": {
+          "type": ["string", "null"],
+          "description": "试卷来源：用户上传/WebSearch/自生成"
+        },
+        "error_adapted_count": {
+          "type": "integer",
+          "description": "从错题集改编的题目数"
+        }
+      }
+    }
+  }
+}

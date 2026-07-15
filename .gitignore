@@ -1,0 +1,12 @@
+# macOS
+.DS_Store
+
+# Claude Code
+.claude/
+
+# Generated output (can be regenerated from skill + books)
+output/
+
+# Python cache
+__pycache__/
+*.pyc

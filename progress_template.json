@@ -1,0 +1,23 @@
+{
+  "subject": "",
+  "textbook": "",
+  "exam_type": "",
+  "source_type": "",
+  "syllabus_source": "",
+  "persona": "",
+  "character": "none",
+  "render_mode": "markdown",
+  "persona_history": [],
+  "diagnostic": {
+    "mode": null,
+    "score": null,
+    "level": null,
+    "level_mode": null,
+    "date": null
+  },
+  "total_chapters": 0,
+  "chapters": [],
+  "knowledge_tracking": {},
+  "ai_generation_meta": null,
+  "final_exam": null
+}
