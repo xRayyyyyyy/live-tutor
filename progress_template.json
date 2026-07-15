@@ -1,5 +1,6 @@
 {
   "subject": "",
+  "learn_mode": "",
   "textbook": "",
   "exam_type": "",
   "source_type": "",
@@ -19,5 +20,9 @@
   "chapters": [],
   "knowledge_tracking": {},
   "ai_generation_meta": null,
-  "final_exam": null
+  "twenty_hour_plan": null,
+  "resource_recommendations": null,
+  "learning_ladder": null,
+  "final_exam": null,
+  "learning_summary": null
 }

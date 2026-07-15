@@ -1,13 +1,18 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Live-Tutor Progress Schema v1.6.1",
-  "description": "自适应学习进度跟踪数据结构（v1.6.1 单文件双 Tab + HTML 全流程覆盖）",
+  "title": "Live-Tutor Progress Schema v1.7.0",
+  "description": "自适应学习进度跟踪数据结构（v1.7.0 双模式：备考 + 学习）",
   "type": "object",
-  "required": ["subject", "exam_type", "persona", "source_type", "syllabus_source", "total_chapters", "chapters", "diagnostic"],
+  "required": ["subject", "learn_mode", "persona", "source_type", "syllabus_source", "total_chapters", "chapters"],
   "properties": {
     "subject": {
       "type": "string",
       "description": "科目名称（初始化时为空，Step 0 填入）"
+    },
+    "learn_mode": {
+      "type": "string",
+      "enum": ["exam", "learn"],
+      "description": "学习模式（v1.7.0 新增）。exam=备考模式（有考试、测验、错题集），learn=学习模式（费曼循环、速查表、无考试）。自动检测：上传文件→exam，纯关键词→learn"
     },
     "textbook": {
       "type": "string",
@@ -15,8 +20,8 @@
     },
     "source_type": {
       "type": "string",
-      "enum": ["", "pdf", "ppt", "markdown", "ai_generated", "course_library"],
-      "description": "内容来源类型（v1.5 新增，v1.6 扩展）。初始化为空，pdf/ppt/markdown=用户上传教材，ai_generated=AI从训练知识生成，course_library=预置课程库"
+      "enum": ["", "pdf", "ppt", "markdown", "ai_generated", "course_library", "keyword"],
+      "description": "内容来源类型（v1.5 新增，v1.6 扩展，v1.7.0 新增 keyword）。初始化为空，pdf/ppt/markdown=用户上传教材，ai_generated=AI从训练知识生成，keyword=关键词学习，course_library=预置课程库"
     },
     "syllabus_source": {
       "type": "string",
@@ -85,7 +90,110 @@
     "exam_type": {
       "type": "string",
       "enum": ["", "期末", "期中", "随堂", "考研", "其他"],
-      "description": "考试类型（初始化为空）"
+      "description": "考试类型（初始化为空，仅 exam 模式使用）"
+    },
+    "twenty_hour_plan": {
+      "type": ["object", "null"],
+      "description": "20小时学习计划（v1.7.0 新增，两种模式共用）",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "用户是否启用了20小时计划"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "in_progress", "completed", "skipped"],
+          "description": "计划状态"
+        },
+        "core_twenty_percent": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "核心20%知识点列表"
+        },
+        "sessions": {
+          "type": "array",
+          "description": "10节课计划",
+          "items": {
+            "type": "object",
+            "properties": {
+              "session_num": { "type": "integer", "minimum": 1, "maximum": 10 },
+              "goal": { "type": "string", "description": "本节课学习目标" },
+              "key_concepts": { "type": "array", "items": { "type": "string" } },
+              "exercise": { "type": "string", "description": "实践练习" },
+              "resource": { "type": "string", "description": "推荐资源" },
+              "status": { "type": "string", "enum": ["pending", "completed"] },
+              "completed_at": { "type": ["string", "null"], "format": "date" }
+            }
+          }
+        },
+        "final_project": {
+          "type": "string",
+          "description": "综合能力检验项目"
+        },
+        "created_at": { "type": "string", "format": "date" }
+      }
+    },
+    "resource_recommendations": {
+      "type": ["object", "null"],
+      "description": "资源策展（v1.7.0 新增，两种模式共用）",
+      "properties": {
+        "global_resources": {
+          "type": "array",
+          "description": "初始化时推荐的全局资源（Step 0）",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "type": { "type": "string", "enum": ["book", "video", "course", "website", "newsletter", "community"] },
+              "reason": { "type": "string" },
+              "difficulty": { "type": "string", "enum": ["beginner", "intermediate", "advanced"] },
+              "url": { "type": ["string", "null"] }
+            }
+          }
+        },
+        "session_resources": {
+          "type": "object",
+          "description": "20小时计划中每节课的精准资源推荐",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "type": { "type": "string" },
+                "reason": { "type": "string" },
+                "url": { "type": ["string", "null"] }
+              }
+            }
+          }
+        },
+        "created_at": { "type": "string", "format": "date" }
+      }
+    },
+    "learning_ladder": {
+      "type": ["object", "null"],
+      "description": "学习阶梯（v1.7.0 新增，仅 learn 模式）",
+      "properties": {
+        "levels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "level": { "type": "integer", "minimum": 1, "maximum": 5 },
+              "name": { "type": "string" },
+              "description": { "type": "string" },
+              "mastery_criteria": { "type": "string" },
+              "key_concepts": { "type": "array", "items": { "type": "string" } },
+              "milestone": { "type": "string" },
+              "exercise": { "type": "string" },
+              "common_mistakes": { "type": "array", "items": { "type": "string" } },
+              "self_check": { "type": "string" }
+            }
+          }
+        },
+        "current_level": { "type": "integer" },
+        "created_at": { "type": "string", "format": "date" }
+      }
     },
     "persona": {
       "type": "string",
@@ -228,6 +336,21 @@
               }
             }
           },
+          "feynman_loops": {
+            "type": "array",
+            "description": "费曼循环记录（v1.7.0 新增，两种模式均可用）",
+            "items": {
+              "type": "object",
+              "properties": {
+                "topic": { "type": "string", "description": "费曼挑战的主题" },
+                "iterations": { "type": "integer", "description": "循环次数" },
+                "initial_score": { "type": "integer", "minimum": 0, "maximum": 10, "description": "首次复述评分" },
+                "final_score": { "type": "integer", "minimum": 0, "maximum": 10, "description": "最终复述评分" },
+                "gaps_found": { "type": "array", "items": { "type": "string" }, "description": "发现的理解漏洞" },
+                "date": { "type": "string", "format": "date" }
+              }
+            }
+          },
           "error_review_schedule": {
             "type": "array",
             "description": "错题复习计划",
@@ -313,6 +436,17 @@
           "type": "integer",
           "description": "从错题集改编的题目数"
         }
+      }
+    },
+    "learning_summary": {
+      "type": ["object", "null"],
+      "description": "学习总结（v1.7.0 新增，仅 learn 模式）",
+      "properties": {
+        "topics_completed": { "type": "integer" },
+        "cheat_sheets_generated": { "type": "integer" },
+        "feynman_loops_completed": { "type": "integer" },
+        "avg_comprehension_score": { "type": "number", "minimum": 0, "maximum": 10 },
+        "date": { "type": "string", "format": "date" }
       }
     }
   }
