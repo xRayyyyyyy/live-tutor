@@ -65,6 +65,7 @@
 | **R-CON-10** | 每个 Session/章节讲解必须包含一张 Mermaid 全景路线图（flowchart TD），标注当前进度位置，让学习者知道"我在哪、下一步是什么"（v1.7.0 新增） |
 | **R-CON-11** | `render_mode = "html"` 时，Mermaid 须在 `<head>` 加载 CDN 并初始化暗色主题配置（`primaryColor:#1e3a5f`、`lineColor:#94a3b8`），确保与页面暗色主题统一（v1.7.0 新增） |
 | **R-CON-12** | Mermaid 图表和 HTML 正文中**禁止使用 Unicode 特殊符号**（如 ↔ ⇔ 🕐 🎵 等），原因：中文字体（STHeiti/PingFang）可能不含这些字形导致静默不渲染。替代方案：Mermaid 标签用 ASCII（`--` 代替 `↔`），HTML 正文用 MathJax（`$\longleftrightarrow$` 代替 `↔`，`$\delta$` 代替 `δ`）（v1.7.0 新增） |
+| **R-CON-13** | `render_mode = "html"` 时，若公式中使用 `\xleftrightarrow`、`\xrightarrow` 等可扩展箭头命令，MathJax 配置**必须**加载 `extpfeil` 扩展：`packages: {'[+]': ['extpfeil']}` + `loader: { load: ['[tex]/extpfeil'] }`，否则箭头不渲染（v1.7.0 新增） |
 
 ## Persona 规则
 

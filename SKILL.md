@@ -1106,7 +1106,7 @@ Session N ✅ → Session N+1 ✅ → Session N+2 ✅ → 🔍 边界探测
 
 当 `render_mode = "html"` 时，所有输出文件必须为完整 HTML5 文档，满足：
 
-1. **公式渲染**：MathJax 3 CDN，预定义宏 `\E`→$\mathrm{E}$、`\Var`→$\mathrm{Var}$、`\Cov`→$\mathrm{Cov}$、`\R`→$\mathbb{R}$
+1. **公式渲染**：MathJax 3 CDN，预定义宏 `\E`→$\mathrm{E}$、`\Var`→$\mathrm{Var}$、`\Cov`→$\mathrm{Cov}$、`\R`→$\mathbb{R}$。若使用 `\xleftrightarrow` 等可扩展箭头，必须加载 `extpfeil` 扩展：`packages: {'[+]': ['extpfeil']}` + `loader: { load: ['[tex]/extpfeil'] }`
 2. **样式系统**：暗色主题，CSS 变量统一，响应式 880px，卡片式布局
 3. **图表**：Mermaid 暗色主题配置（`primaryColor:#1e3a5f`、`lineColor:#94a3b8`），在 `<head>` 加载 CDN 并初始化
 4. **信号图**：调用 `scripts/plot_signals.py` 生成 PNG，保存到 `output/{科目}/images/`，HTML 中用 `<figure>` + `<img>` 引用。命令：`sine`（正弦波）、`superpose`（叠加）、`spectrum`（频谱）、`compare`（时域vs频域）、`square`（方波分解）
