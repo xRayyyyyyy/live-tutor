@@ -1112,6 +1112,7 @@ Session N ✅ → Session N+1 ✅ → Session N+2 ✅ → 🔍 边界探测
 4. **信号图**：调用 `scripts/plot_signals.py` 生成 PNG，保存到 `output/{科目}/images/`，HTML 中用 `<figure>` + `<img>` 引用。命令：`sine`（正弦波）、`superpose`（叠加）、`spectrum`（频谱）、`compare`（时域vs频域）、`square`（方波分解）
 5. **图片**：`<figure>` + `<img>` + `<figcaption>` 三件套
 6. **自动打开**：所有输出文件生成后 `open` 自动在浏览器打开
+7. **禁止 Unicode 特殊符号**：Mermaid 标签和 HTML 正文中避免 ↔ ⇔ δ 🕐 🎵 等 Unicode 符号（中文字体可能不含字形）。替代：Mermaid 用 `--`，HTML 用 MathJax `$\longleftrightarrow$` `$\delta$`
 
 ---
 

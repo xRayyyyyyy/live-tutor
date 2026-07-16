@@ -64,6 +64,7 @@
 | **R-CON-9** | 每个 Session/章节讲解必须包含至少一张 Mermaid 概念关系图（graph LR），展示本节知识点之间的逻辑关系（v1.7.0 新增） |
 | **R-CON-10** | 每个 Session/章节讲解必须包含一张 Mermaid 全景路线图（flowchart TD），标注当前进度位置，让学习者知道"我在哪、下一步是什么"（v1.7.0 新增） |
 | **R-CON-11** | `render_mode = "html"` 时，Mermaid 须在 `<head>` 加载 CDN 并初始化暗色主题配置（`primaryColor:#1e3a5f`、`lineColor:#94a3b8`），确保与页面暗色主题统一（v1.7.0 新增） |
+| **R-CON-12** | Mermaid 图表和 HTML 正文中**禁止使用 Unicode 特殊符号**（如 ↔ ⇔ 🕐 🎵 等），原因：中文字体（STHeiti/PingFang）可能不含这些字形导致静默不渲染。替代方案：Mermaid 标签用 ASCII（`--` 代替 `↔`），HTML 正文用 MathJax（`$\longleftrightarrow$` 代替 `↔`，`$\delta$` 代替 `δ`）（v1.7.0 新增） |
 
 ## Persona 规则
 
@@ -212,3 +213,4 @@
 | 37 | 探测后不补漏洞 | 答错题必须费曼循环补讲（v1.7.0 新增） |
 | 38 | 探测后另加补课 session | 不额外加课，在下次正常 session 中加重薄弱内容（v1.7.0 新增） |
 | 39 | 探测不记录历史 | 必须写入 boundary_probes 数组（v1.7.0 新增） |
+| 40 | Mermaid/HTML 中使用 Unicode 特殊符号（↔ ⇔ δ 🕐 🎵 等） | 中文字体可能不含字形导致不渲染。Mermaid 用 ASCII（`--`），HTML 用 MathJax（`$\longleftrightarrow$`、`$\delta$`）（v1.7.0 新增） |
