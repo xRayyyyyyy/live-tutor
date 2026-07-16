@@ -629,7 +629,7 @@ Level 5: 🎯 熟练实践者
 1. 提取/生成该章内容（按 source_type 路由）
 2. **按本章的 per_chapter_level 过滤**（不再用全局等级）
 3. **重学时注入错题集**：若本章有错题历史，注入「⚠️ 上次易错点」段
-4. **包含可视化图表**：概念关系/推导链用 Mermaid，波形用 ASCII
+4. **包含可视化图表**：概念关系/推导链用 Mermaid，波形/频谱用 `scripts/plot_signals.py` 生成 PNG
 5. 按 Persona 增强 + IP 角色注入
 6. 输出为**单个 HTML 文件**
 7. 文件命名：`L{N}_{第X章}_{模式}({分数档}).html`
@@ -792,7 +792,12 @@ L{N}_{第X章}_{模式}({分数档}).{md|html}
 1. 生成该主题的完整知识点（按 extraction.md 路径 K）
 2. 按学习阶梯级别过滤深度
 3. 按 Persona 增强 + IP 角色注入
-4. 输出讲解内容（Markdown 或 HTML）
+4. **生成可视化图表**（v1.7.0 新增）：
+   - 调用 `python3 scripts/plot_signals.py` 生成波形/频谱/叠加等 PNG 图片，保存到 `output/{科目}/images/`
+   - 插入 Mermaid 概念关系图（graph LR）：展示本节知识点逻辑关系
+   - 插入 Mermaid 全景路线图（flowchart TD）：标注当前 session 在整体学习路线中的位置
+   - HTML 中用 `<figure>` + `<img>` + `<figcaption>` 引用图片
+5. 输出讲解内容（Markdown 或 HTML）
 
 ### 讲解内容结构
 
@@ -1103,9 +1108,10 @@ Session N ✅ → Session N+1 ✅ → Session N+2 ✅ → 🔍 边界探测
 
 1. **公式渲染**：MathJax 3 CDN，预定义宏 `\E`→$\mathrm{E}$、`\Var`→$\mathrm{Var}$、`\Cov`→$\mathrm{Cov}$、`\R`→$\mathbb{R}$
 2. **样式系统**：暗色主题，CSS 变量统一，响应式 880px，卡片式布局
-3. **图表**：Mermaid 暗色主题配置
-4. **图片**：`<figure>` + `<img>` + `<figcaption>` 三件套
-5. **自动打开**：所有输出文件生成后 `open` 自动在浏览器打开
+3. **图表**：Mermaid 暗色主题配置（`primaryColor:#1e3a5f`、`lineColor:#94a3b8`），在 `<head>` 加载 CDN 并初始化
+4. **信号图**：调用 `scripts/plot_signals.py` 生成 PNG，保存到 `output/{科目}/images/`，HTML 中用 `<figure>` + `<img>` 引用。命令：`sine`（正弦波）、`superpose`（叠加）、`spectrum`（频谱）、`compare`（时域vs频域）、`square`（方波分解）
+5. **图片**：`<figure>` + `<img>` + `<figcaption>` 三件套
+6. **自动打开**：所有输出文件生成后 `open` 自动在浏览器打开
 
 ---
 
@@ -1120,7 +1126,8 @@ live-tutor/
 ├── iron-rules.md                   # 铁律规则 + 反模式
 ├── extraction.md                   # 内容获取管线（v1.7.0 含路径 K：关键词学习）
 ├── scripts/
-│   └── review_calc.py              # SM-2 间隔复习计算工具（v1.3）
+│   ├── review_calc.py              # SM-2 间隔复习计算工具（v1.3）
+│   └── plot_signals.py             # 信号可视化工具（v1.7.0 新增：波形/频谱/叠加/对比图）
 ├── agents/
 │   ├── tutor_agent.md              # 自适应调度 agent
 │   ├── assess_agent.md             # 测评 + 评卷 agent
@@ -1138,6 +1145,7 @@ live-tutor/
 └── output/
     └── {科目}/
         ├── progress.json           # 含 learn_mode/twenty_hour_plan/feynman_loops 等
+        ├── images/                 # matplotlib 生成的信号可视化 PNG
         ├── 入学测评_摸底测试.{md|html}          # 🅰️ 备考模式
         ├── L{N}_{第X章}_{模式}({分数档}).{md|html}
         ├── L{N}_{第X章}_错题集.{md|html}
