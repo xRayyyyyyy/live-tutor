@@ -66,7 +66,8 @@ metadata:
 
 | 文件 | 内容 | 加载时机 |
 |------|------|---------|
-| `persona.md` | Persona A-E 定义、行为矩阵、切换机制 | Step 0 |
+| `persona.md` | 🅰️ 备考模式 Persona A-E 定义、行为矩阵、切换机制 | Step 0（exam） |
+| `persona-learn.md` | 🅱️ 学习模式 Persona A-E 定义、行为矩阵（独立设计） | Step 0（learn） |
 | `character-voices.md` | IP 角色语音系统（懒羊羊/哪吒/小小怪/灰太狼） | Step 0 |
 | `iron-rules.md` | 铁律规则 + 反模式 | 全程参考 |
 | `extraction.md` | 内容获取管线（PDF/PPT/Markdown/AI/关键词/课程库） | Step 2 |
@@ -263,7 +264,7 @@ metadata:
 
 **学习模式的 Persona 适配**：
 
-学习模式下使用专属设计的 Persona（详见 `persona.md`）：
+学习模式下使用专属设计的 Persona（详见 `persona-learn.md`）：
 
 ```
 🎓 选择你的学习风格：
@@ -275,7 +276,7 @@ metadata:
 [E] 深度探索型   — 前沿内容 + 开放问题 + 跨学科
 ```
 
-> 注：学习模式 Persona 从学习立场重新设计，与备考模式 Persona 互相独立。每种 Persona 对解释风格、公式处理、实践练习、费曼挑战、速查表、资源推荐等 10 个维度有差异化行为。详见 `persona.md` 学习模式行为矩阵。
+> 注：学习模式 Persona 从学习立场独立设计，与备考模式完全分离。每种 Persona 对解释风格、公式处理、实践练习、费曼挑战、速查表、资源推荐等 10 个维度有差异化行为。详见 `persona-learn.md` 行为矩阵。
 
 **学习模式的其余初始化**：与备考模式一致（IP 角色选择 → 渲染模式 → init progress）。
 
@@ -1113,7 +1114,8 @@ Session N ✅ → Session N+1 ✅ → Session N+2 ✅ → 🔍 边界探测
 ```
 live-tutor/
 ├── SKILL.md                        # 本文件 — 工作流骨架（v1.7.0 双模式）
-├── persona.md                      # Persona 系统 + 切换机制
+├── persona.md                      # 🅰️ 备考模式 Persona 系统 + 切换机制
+├── persona-learn.md                # 🅱️ 学习模式 Persona 系统（独立设计）
 ├── character-voices.md             # IP 角色语音系统（v1.4）
 ├── iron-rules.md                   # 铁律规则 + 反模式
 ├── extraction.md                   # 内容获取管线（v1.7.0 含路径 K：关键词学习）
