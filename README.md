@@ -1,56 +1,98 @@
-# Live-Tutor — 自适应私人教师 v1.6.1
+# Live-Tutor — 自适应私人教师 & 学习教练 v1.7.0
 
-> 基于 Claude Code Skill 的智能学习系统，支持 Markdown/PDF/PPT/AI 生成四种输入源。
+> 基于 Claude Code Skill 的智能学习系统。双模式：🅰️ 备考模式（教材+考试）& 🅱️ 学习模式（关键词+理解）。
 
-[![Version](https://img.shields.io/badge/version-1.6.1-blue)](SKILL.md)
+[![Version](https://img.shields.io/badge/version-1.7.0-blue)](SKILL.md)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-## 功能
+## 双模式
 
-- **四入口**：上传教材 PDF/PPT/Markdown，或仅输入科目名由 AI 生成全部内容
-- **自适应等级**：L1（基础）→ L2（巩固）→ L3（提升）→ L4（全面），按章独立跟踪
-- **单文件双 Tab**：学习手册 + 章节小测合并为单个 HTML，MathJax + Mermaid 渲染
-- **JS 自动评卷**：MCQ 即时评分 + 简答大模型评判，剪贴板 + 文件下载双通道回传
+| | 🅰️ 备考模式 | 🅱️ 学习模式 |
+|---|---|---|
+| **用户** | 有教材、要考试的学生 | 想学任何知识的普通人 |
+| **输入** | PDF/PPT/Markdown 教材 | 任意关键词 |
+| **验证** | 章节测验 + 错题集 + 终考 | 费曼循环 + 边界探测 + 速查表 |
+| **节奏** | 按章节逐章推进 | 按主题灵活学习 |
+
+## 核心功能
+
+- **四入口 + 关键词**：上传教材 PDF/PPT/Markdown、AI 生成、或仅输入关键词即可开始学习
+- **模式自动检测**：上传文件 → 备考模式，纯关键词 → 学习模式
+- **自适应等级**（备考）：L1-L4 四级，按章独立跟踪
+- **学习阶梯**（学习）：5 级渐进地图，边界探测驱动升降级
+- **20小时学习计划**：基于二八定律，10 节课掌握核心 20%（两种模式共用）
+- **边界探测**：每 3 个 session 一轮渐进测试（7 题简答），找到理解边界
+- **费曼循环**：用 12 岁语言解释 → 复述 → 找漏洞 → 补讲 → 循环
+- **资源策展**：精选 3-5 个最佳学习资源 + 排序推荐
+- **速查表**：每主题自动生成 5 分钟可复习的压缩笔记
+- **SM-2 间隔复习**：基于艾宾浩斯遗忘曲线的知识点追踪（两种模式共用）
+- **单文件双 Tab**（备考）：学习手册 + 章节小测合并为单个 HTML
 - **IP 角色语音**：懒羊羊/哪吒/小小怪下士/灰太狼四种教学风格
-- **SM-2 间隔复习**：基于艾宾浩斯遗忘曲线的知识点追踪
+
+## 工作流
+
+```
+Phase 0: PATH（规划）
+  Step 0     初始化 + 模式检测 + 全局资源策展
+  Step 1     🅰️ 诊断测试定级 / 🅱️ 学习阶梯
+  Step 1.5   20小时计划（可选，两种模式共用）
+
+Phase 1: LEARN（学习循环）— 每3个session为一轮
+  Session ×3   主题讲解 + 速查表 + 可选费曼
+  🔍 边界探测   7题渐进简答 → 找边界 → 费曼补漏 → 调级别
+  📄 压缩       合并速查表 + SM-2 初始化
+  ↻ 重复
+
+Phase 2: FINISH（收尾）
+  Step 5.5   🅰️ 考前备忘录 / 🅱️ 学习总结
+  Step 6     🅰️ 终考 / 🅱️ 完成报告
+
+贯穿全程: SM-2 间隔复习
+```
 
 ## 架构
 
 ```
 live-tutor/
-├── SKILL.md                    # 工作流骨架（6步 + 2插入点）
-├── iron-rules.md               # 52条铁律规则 + 29条反模式
+├── SKILL.md                    # 工作流骨架（双模式 + 边界探测）
+├── iron-rules.md               # 铁律规则 + 反模式
 ├── persona.md                  # 5种Persona教学风格
 ├── character-voices.md         # 4种IP角色语音系统
-├── extraction.md               # 内容获取管线（4路径路由）
+├── extraction.md               # 内容获取管线（5路径：PDF/PPT/Markdown/AI/关键词）
 ├── progress_schema.json        # 进度数据结构 JSON Schema
 ├── progress_template.json      # 进度初始化模板
 ├── agents/                     # Agent调度层
-│   ├── tutor_agent.md          # 学习手册生成 + 小测出题
+│   ├── tutor_agent.md          # 学习手册/讲解生成
 │   ├── assess_agent.md         # 测评 + 评卷
-│   └── exam_agent.md           # 最终综合检测
+│   └── exam_agent.md           # 最终综合检测（备考模式）
 ├── templates/                  # 输出模板
-│   ├── learning-manual.md      # 学习手册（六段式 + HTML质量准则）
+│   ├── learning-manual.md      # 学习手册（备考模式）
 │   ├── quiz.md                 # 测验模板
-│   ├── error-collection.md     # 错题集
-│   └── pre-exam-memo.md        # 考前备忘录
+│   ├── error-collection.md     # 错题集（备考模式）
+│   ├── pre-exam-memo.md        # 考前备忘录（备考模式）
+│   ├── 20-hour-plan.md         # 20小时学习计划（共用）
+│   ├── cheat-sheet.md          # 速查表（学习模式）
+│   └── learning-summary.md     # 学习总结报告（学习模式）
 ├── scripts/
 │   └── review_calc.py          # SM-2间隔复习计算工具
-└── books/                      # 教材源文件（Markdown）
+└── output/                     # 学习输出
 ```
 
 ## 快速开始
 
 1. 在 Claude Code 中加载 skill
-2. 输入触发词：`live-tutor`、`私人教师`、`备考`、`帮我复习`
-3. 选择内容来源：[A] 上传教材 / [B] AI 直接生成 / [C] 课程库
+2. 输入触发词：`live-tutor`、`私人教师`、`学习`、`教我`、`帮我学`
+3. 系统自动检测模式：
+   - 上传文件/提到考试 → 🅰️ 备考模式
+   - 输入关键词 → 🅱️ 学习模式
 4. 选择 Persona + IP 角色 + 渲染模式
-5. 开始自适应学习
+5. 开始学习！
 
 ## 版本演进
 
 | 版本 | 日期 | 核心主题 |
 |------|------|---------|
+| v1.7.0 | 2026-07-16 | 双模式（备考+学习）、20小时计划、费曼循环、边界探测、资源策展 |
 | v1.6.1 | 2026-07-14 | 单文件双 Tab + 质量体系完善 + HTML 全流程覆盖 |
 | v1.6 | 2026-07-13 | Markdown 输入源 + 路径 M 提取管线 |
 | v1.5.1 | 2026-07-07 | ISBN/教材信息精准匹配 |

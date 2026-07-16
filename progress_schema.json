@@ -192,6 +192,20 @@
           }
         },
         "current_level": { "type": "integer" },
+        "level_history": {
+          "type": "array",
+          "description": "级别变化历史（v1.7.0 新增，边界探测驱动）",
+          "items": {
+            "type": "object",
+            "properties": {
+              "from_level": { "type": "integer" },
+              "to_level": { "type": "integer" },
+              "reason": { "type": "string" },
+              "probe_round": { "type": "integer" },
+              "date": { "type": "string", "format": "date" }
+            }
+          }
+        },
         "created_at": { "type": "string", "format": "date" }
       }
     },
@@ -447,6 +461,44 @@
         "feynman_loops_completed": { "type": "integer" },
         "avg_comprehension_score": { "type": "number", "minimum": 0, "maximum": 10 },
         "date": { "type": "string", "format": "date" }
+      }
+    },
+    "boundary_probes": {
+      "type": "array",
+      "description": "边界探测历史（v1.7.0 新增，仅 learn 模式）",
+      "items": {
+        "type": "object",
+        "properties": {
+          "round": { "type": "integer", "description": "第几轮探测" },
+          "triggered_after_sessions": {
+            "type": "array",
+            "items": { "type": "integer" },
+            "description": "触发本次探测的 session 编号"
+          },
+          "current_level_before": { "type": "integer" },
+          "current_level_after": { "type": "integer" },
+          "level_changed": { "type": "boolean" },
+          "questions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "q_num": { "type": "integer" },
+                "difficulty_level": { "type": "number", "description": "题目难度级别（可含小数如 2.5）" },
+                "topic": { "type": "string" },
+                "score": { "type": "integer", "minimum": 0, "maximum": 10 },
+                "correct_parts": { "type": "array", "items": { "type": "string" } },
+                "gaps": { "type": "array", "items": { "type": "string" } },
+                "feynman_loops": { "type": "integer", "description": "费曼补讲轮数（0=答对未触发）" }
+              }
+            }
+          },
+          "total_score": { "type": "integer", "description": "总分（满分70）" },
+          "boundary_level": { "type": "integer", "description": "探测到的理解边界级别" },
+          "strong_areas": { "type": "array", "items": { "type": "string" } },
+          "weak_areas": { "type": "array", "items": { "type": "string" } },
+          "date": { "type": "string", "format": "date" }
+        }
       }
     }
   }

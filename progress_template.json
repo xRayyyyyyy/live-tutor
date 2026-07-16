@@ -24,5 +24,6 @@
   "resource_recommendations": null,
   "learning_ladder": null,
   "final_exam": null,
-  "learning_summary": null
+  "learning_summary": null,
+  "boundary_probes": []
 }
