@@ -310,6 +310,7 @@ metadata:
 - 优先推荐免费或易获取的资源
 - 使用 WebSearch 验证资源链接可用性和时效性
 - 资源写入 `progress.json` 的 `resource_recommendations.global_resources`
+- **必须生成独立 HTML 报告**（R-RES-5）：`Session0_学习资源指南.{md|html}`，所有资源以可点击超链接形式呈现，用户点击直达
 
 ---
 
@@ -329,11 +330,11 @@ metadata:
 
 ---
 
-## Step 0.5: 间隔复习检查（v1.3 新增，两种模式共用）
+## Step 0.5: 间隔复习检查（v1.3 新增，两种模式共用，⚠️ 强制步骤）
 
 ### 触发时机
 
-每次新会话进入逐章/逐主题学习循环前（Step 2.5 之前），或用户说"继续下一章/主题"时。
+每次新会话进入逐章/逐主题学习循环前（Step 2.5 之前），或用户说"继续下一章/主题"时。**必须执行**，不可跳过（R-REVIEW-7）。
 
 ### 流程
 
@@ -785,6 +786,21 @@ L{N}_{第X章}_{模式}({分数档}).{md|html}
 
 ## Step 3: 主题讲解 + 速查表（🅱️ 学习模式，v1.7.0 新增）
 
+### 讲解前：Level 影响矩阵应用（⚠️ 强制，R-LEVEL-1）
+
+生成内容前必须执行以下读取和调整：
+
+1. **读取 `learning_ladder.current_level`**
+2. **按 Level 影响矩阵调整 6 个维度**（详见 `persona-learn.md`）：
+   - 解释风格（类比/因果链/推导/多角度）
+   - 公式密度（仅结论/结论+推导/完整推导/推导+边界）
+   - 练习类型（观察/验证/应用/设计/研究）
+   - 知识点数（3-4/5-6/6-8/8+）
+   - 跨主题连接（无/2-3处/频繁/跨领域）
+   - 速查表风格（概念图/+公式/+推导/+对比表）
+3. **检查 `probe_weak_areas`**：若非空，开头插入「⚠️ 上轮探测薄弱点回顾」段落，实践中至少 1 题围绕薄弱概念，费曼挑战优先使用薄弱概念
+4. **检查 Level 是否刚变化**：升级则插入「🎉 升级通知」，降级则插入「📌 基础巩固」
+
 ### 讲解流程
 
 调用 **tutor_agent**，为每个主题生成讲解内容：
@@ -838,14 +854,14 @@ L{N}_{第X章}_{模式}({分数档}).{md|html}
 
 ---
 
-## 🔍 边界探测（🅱️ 学习模式，v1.7.0 新增）
+## 🔍 边界探测（🅱️ 学习模式，v1.7.0 新增，⚠️ 强制步骤）
 
-### 触发机制
+### 触发机制（R-PROBE-0：不可跳过）
 
-每完成 3 个 Session/主题后，自动触发一轮边界探测：
+每完成 3 个 Session/主题后，**必须**自动触发一轮边界探测。用户说"继续"时，若已满 3 session 阈值，**必须先完成探测再进入下一 session**。
 
 ```
-Session N ✅ → Session N+1 ✅ → Session N+2 ✅ → 🔍 边界探测
+Session N ✅ → Session N+1 ✅ → Session N+2 ✅ → 🔍 边界探测 [强制]
 ```
 
 ### 探测设计（参考 "Quiz Me Until I Break"）
@@ -894,9 +910,9 @@ Session N ✅ → Session N+1 ✅ → Session N+2 ✅ → 🔍 边界探测
 | Q1-Q3 均 ≥ 7 **但** Q4-Q5 均 ≤ 4 | **保持 →**（下次再探） |
 | Q1-Q3 有 ≤ 4 | **降级 ↓**，优先补漏洞 |
 
-### 探测后的处理流程
+### 探测后的处理流程（⚠️ 5 个动作全部强制，R-PROBE-0）
 
-1. **展示探测报告**：
+1. **① 生成探测报告**（R-PROBE-6）：
 
 ```
 📊 边界探测报告 — 第 {N} 轮
@@ -904,19 +920,34 @@ Session N ✅ → Session N+1 ✅ → Session N+2 ✅ → 🔍 边界探测
   最终得分：{X}/70
   理解边界：Level {N}
 
+  Q1 [Level-1] ✅ {score}/10  {concept}
+  Q2 [Level]   ✅ {score}/10  {concept}
+  Q3 [Level]   ✅ {score}/10  {concept}
+  Q4 [Level+0.5] 🟡 {score}/10  {concept}
+  Q5 [Level+1] ❌ {score}/10  {concept}
+  Q6-Q7 [动态] ...
+
   ✅ 掌握的：{概念A}、{概念B}、{概念C}
   ❌ 漏洞在：{概念D}、{概念E}
 
   级别调整：Level {prev} → Level {new} {↑/↓/→}
-
-  下一步：后续 session 将加重 {概念D/E} 相关内容
 ```
 
-2. **费曼补漏**：对答错的题目，触发费曼循环补讲（最多 3 轮）
-3. **调整后续内容**：不额外加补课 session，而是在下次正常 session 中加重薄弱内容
-4. **生成合并速查表**：将本轮 3 个 session 的内容压缩为一张速查表
-5. **SM-2 初始化**：探测中的答题结果写入 knowledge_tracking（答对 → quality 4-5，答错 → quality 1-2）
-6. **记录探测历史**：写入 `progress.json` 的 `boundary_probes` 数组
+2. **② 级别调整**（R-PROBE-7）：写入 `progress.json` 的 `learning_ladder.current_level` 和 `level_history`
+
+3. **③ 费曼补漏**（R-PROBE-8）：对答错的题目（score ≤ 5），触发费曼循环补讲（最多 3 轮），记录 `initial_score → final_score`
+
+4. **④ 注入薄弱点到后续 session**（R-PROBE-12, R-LEVEL-5）：
+   - 薄弱概念写入 `progress.json` 的 `probe_weak_areas`
+   - 下一 session 开头插入「⚠️ 上轮探测薄弱点回顾」
+   - 实践中至少 1 题围绕薄弱概念
+   - 费曼挑战优先使用薄弱概念出题
+   - 下轮探测 Q2-Q3 中至少 1 题重新测试上轮薄弱点
+
+5. **⑤ SM-2 init + 合并速查表**（R-PROBE-9, R-PROBE-10）：
+   - 答题结果写入 `knowledge_tracking`（答对 quality 4-5，答错 quality 1-2）
+   - 运行 `review_calc.py init`
+   - 生成本轮 3 个 session 的合并速查表（参照 `templates/merged-cheatsheet.md`）
 
 ### 探测与 IP 角色结合
 
@@ -927,17 +958,15 @@ Session N ✅ → Session N+1 ✅ → Session N+2 ✅ → 🔍 边界探测
 
 ---
 
-## Step 5: 理解度记录（🅱️ 学习模式，v1.7.0 新增）
-
-学习模式下没有传统考试，通过以下方式追踪理解度：
+## Step 5: 理解度记录（🅱️ 学习模式，v1.7.0 新增，⚠️ 强制步骤）
 
 ### 费曼理解度评分
 
 若用户完成了费曼循环，记录 `feynman_loops` 中的 `final_score`（0-10）。
 
-### 自评检验
+### 自评检验（⚠️ 强制，R-SELF-ASSESS-1）
 
-若用户跳过费曼循环，提供快速自评：
+**若用户跳过费曼循环，必须弹出自评，不可直接进入下一 session：**
 
 ```
 📋 主题 {N} 学完了！快速自评一下：
@@ -947,11 +976,25 @@ Session N ✅ → Session N+1 ✅ → Session N+2 ✅ → 🔍 边界探测
 [C] 我还是不太懂 → ❌ 需要重学（quality=1）
 ```
 
-### SM-2 初始化
+自评结果**必须**写入 `knowledge_tracking` 的 quality 字段（R-SELF-ASSESS-2）。
 
-根据理解度评分，将该主题的 ⭐⭐⭐ 知识点写入 `knowledge_tracking`：
-- 运行 `python3 scripts/review_calc.py init`
-- 后续复习提醒与备考模式完全一致
+### SM-2 初始化（⚠️ 强制，R-PROGRESS-2）
+
+每个 session 结束后**必须**执行：
+1. 将该 session 的 ⭐⭐⭐ 知识点写入 `knowledge_tracking`
+2. 运行 `python3 scripts/review_calc.py init`
+3. 后续复习提醒与备考模式完全一致
+
+### progress.json 强制更新（⚠️ 强制，R-PROGRESS-1）
+
+每个 session 结束后**必须**更新 `progress.json`：
+
+```json
+{
+  "chapters": [{"num": N, "status": "completed", "completed_at": "YYYY-MM-DD", "feynman_loops": [...]}],
+  "twenty_hour_plan": {"sessions": [{"session_num": N, "status": "completed", "completed_at": "YYYY-MM-DD"}]}
+}
+```
 
 ### 用户选择
 
@@ -1140,6 +1183,7 @@ live-tutor/
 │   ├── pre-exam-memo.md            # 考前备忘录模板
 │   ├── 20-hour-plan.md             # 20小时学习计划模板（v1.7.0 新增）
 │   ├── cheat-sheet.md              # 速查表模板（v1.7.0 新增）
+│   ├── merged-cheatsheet.md        # 合并速查表模板（v1.7.0 新增，每3 session合并）
 │   └── learning-summary.md         # 学习总结报告模板（v1.7.0 新增）
 ├── progress_schema.json            # progress.json 的 JSON Schema（v1.7.0）
 ├── progress_template.json          # 进度模板（v1.7.0）
@@ -1147,6 +1191,7 @@ live-tutor/
     └── {科目}/
         ├── progress.json           # 含 learn_mode/twenty_hour_plan/feynman_loops 等
         ├── images/                 # matplotlib 生成的信号可视化 PNG
+        ├── Session0_学习资源指南.{md|html}  # 资源策展报告（v1.7.0 新增）
         ├── 入学测评_摸底测试.{md|html}          # 🅰️ 备考模式
         ├── L{N}_{第X章}_{模式}({分数档}).{md|html}
         ├── L{N}_{第X章}_错题集.{md|html}
@@ -1154,5 +1199,6 @@ live-tutor/
         ├── 考前备忘录.{md|html}
         ├── 最终检测_全书考试.{md|html}
         ├── 速查表_{主题名}.{md|html}            # 🅱️ 学习模式
+        ├── 合并速查表_Session{N}-{M}.{md|html} # 🅱️ 每3 session合并（v1.7.0 新增）
         └── 学习总结_{subject}.{md|html}
 ```

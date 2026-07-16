@@ -500,6 +500,22 @@
           "date": { "type": "string", "format": "date" }
         }
       }
+    },
+    "probe_weak_areas": {
+      "type": "array",
+      "description": "边界探测暴露的薄弱概念（v1.7.0 新增，仅 learn 模式）",
+      "items": {
+        "type": "object",
+        "properties": {
+          "concept": { "type": "string", "description": "薄弱概念名称" },
+          "source_probe": { "type": "integer", "description": "来自第几轮探测" },
+          "score": { "type": "integer", "minimum": 0, "maximum": 10 },
+          "remediated": { "type": "boolean", "description": "是否已通过费曼补漏", "default": false },
+          "remediation_score": { "type": ["integer", "null"], "minimum": 0, "maximum": 10 },
+          "retested": { "type": "boolean", "description": "是否在下轮探测中重新测试", "default": false },
+          "retest_score": { "type": ["integer", "null"], "minimum": 0, "maximum": 10 }
+        }
+      }
     }
   }
 }

@@ -25,5 +25,6 @@
   "learning_ladder": null,
   "final_exam": null,
   "learning_summary": null,
-  "boundary_probes": []
+  "boundary_probes": [],
+  "probe_weak_areas": []
 }

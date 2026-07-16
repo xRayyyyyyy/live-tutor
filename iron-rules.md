@@ -122,6 +122,7 @@
 
 | 编号 | 规则 |
 |------|------|
+| **R-PROBE-0** | **边界探测为强制步骤，不可跳过。** 用户说"继续"时，若已满 3 session 阈值，必须先完成探测再进入下一 session。探测完成后必须执行 5 个动作：① 生成报告 ② 级别调整 ③ 费曼补漏 ④ 注入 weak_areas ⑤ SM-2 init + 合并速查表 |
 | **R-PROBE-1** | 学习模式下每完成 3 个 session/主题，必须自动触发一轮边界探测 |
 | **R-PROBE-2** | 边界探测固定 7 题，全部为简答题（禁止 MCQ），一次一题 |
 | **R-PROBE-3** | 难度分布：Q1 低于当前级 → Q2-Q3 当前级 → Q4 试探 → Q5 探测 → Q6-Q7 动态调整 |
@@ -153,6 +154,32 @@
 | **R-RES-2** | 资源优先推荐免费或易获取的材料 |
 | **R-RES-3** | 资源推荐必须使用 WebSearch 验证链接可用性 |
 | **R-RES-4** | 20 小时计划的 session 资源写入 `resource_recommendations.session_resources`，全局资源写入 `resource_recommendations.global_resources` |
+| **R-RES-5** | 全局资源推荐必须生成独立的 HTML 报告文件 `Session0_学习资源指南.{md\|html}`，所有资源以可点击超链接形式呈现（v1.7.0 新增） |
+
+## 进度更新规则（v1.7.0 新增）
+
+| 编号 | 规则 |
+|------|------|
+| **R-PROGRESS-1** | 每个 session 结束后**必须**更新 `progress.json`：`chapters[i].status = "completed"`、`completed_at` 日期、`feynman_loops` 写入、`twenty_hour_plan.sessions[i].status = "completed"` |
+| **R-PROGRESS-2** | progress.json 更新后**必须**运行 `review_calc.py init` 初始化该 session 的 ⭐⭐⭐ 知识点到 `knowledge_tracking` |
+| **R-PROGRESS-3** | 边界探测后**必须**更新 `progress.json`：`learning_ladder.current_level`、`boundary_probes` 数组追加、`probe_weak_areas` 写入 |
+
+## 自评规则（v1.7.0 新增）
+
+| 编号 | 规则 |
+|------|------|
+| **R-SELF-ASSESS-1** | 用户跳过费曼挑战时，**必须**弹出自评 3 选项，不可直接进入下一 session：[A] 能解释清楚 → quality=5 [B] 大致理解 → quality=3 [C] 还是不懂 → quality=1 |
+| **R-SELF-ASSESS-2** | 自评结果必须写入 `knowledge_tracking` 的 quality 字段，并运行 `review_calc.py update` |
+
+## Level 影响规则（v1.7.0 新增）
+
+| 编号 | 规则 |
+|------|------|
+| **R-LEVEL-1** | 生成 session 内容前，**必须**读取 `learning_ladder.current_level`，按 `persona-learn.md` 的 Level 影响矩阵调整 6 个维度：解释风格、公式密度、练习类型、知识点数、跨主题连接、速查表风格 |
+| **R-LEVEL-2** | Level 升级后第一个 session 开头**必须**插入「🎉 升级通知」段落，告知用户后续内容将更深 |
+| **R-LEVEL-3** | Level 降级后第一个 session 开头**必须**插入「📌 基础巩固」段落，加重薄弱内容 |
+| **R-LEVEL-4** | 连续 2 轮探测均为"保持"时，第 3 轮探测自动降低起始难度（从 Level-1 开始） |
+| **R-LEVEL-5** | `probe_weak_areas` 非空时，下一 session 开头**必须**插入「⚠️ 上轮探测薄弱点回顾」段落，实践中至少 1 题围绕薄弱概念，费曼挑战优先使用薄弱概念出题 |
 
 ## 文件命名规则
 
@@ -215,3 +242,8 @@
 | 38 | 探测后另加补课 session | 不额外加课，在下次正常 session 中加重薄弱内容（v1.7.0 新增） |
 | 39 | 探测不记录历史 | 必须写入 boundary_probes 数组（v1.7.0 新增） |
 | 40 | Mermaid/HTML 中使用 Unicode 特殊符号（↔ ⇔ δ 🕐 🎵 等） | 中文字体可能不含字形导致不渲染。Mermaid 用 ASCII（`--`），HTML 用 MathJax（`$\longleftrightarrow$`、`$\delta$`）（v1.7.0 新增） |
+| 41 | 用户说"继续"就跳过边界探测 | 满 3 session 必须先完成探测，不可跳过（v1.7.0 新增） |
+| 42 | Session 结束不更新 progress.json | 每次必须写入完成状态 + 运行 review_calc.py init（v1.7.0 新增） |
+| 43 | 费曼跳过后直接进入下一节 | 必须弹出自评 3 选项（quality=5/3/1），结果写入 knowledge_tracking（v1.7.0 新增） |
+| 44 | Level 升级后 session 内容不变 | 必须按 Level 影响矩阵调整 6 个生成维度（v1.7.0 新增） |
+| 45 | 探测薄弱点不注入后续 session | 必须写入 probe_weak_areas 并在下一 session 加重（v1.7.0 新增） |
